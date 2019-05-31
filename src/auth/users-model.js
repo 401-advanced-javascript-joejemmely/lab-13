@@ -61,14 +61,17 @@ users.statics.authenticateBearer = function(token) {
   if (usedTokens.has(token)) {
     return Promise.reject('Invalid Token');
   }
-
   try {
-    let parsedToken = jwt.verify(token, SECRET);
-    SINGLE_USE_TOKENS && parsedToken.type !== 'key' && usedTokens.add(token);
+    const parsedToken = jwt.verify(token, SECRET);
+
+    if (SINGLE_USE_TOKENS && parsedToken.type !== 'key') {
+      usedTokens.add(token);
+    }
+
     let query = { _id: parsedToken.id };
     return this.findOne(query);
-  } catch (e) {
-    throw new Error('Invalid Token');
+  } catch (error) {
+    return Promise.reject('Invalid Token');
   }
 };
 
@@ -79,7 +82,7 @@ users.methods.comparePassword = function(password) {
 };
 
 users.methods.generateToken = function(type) {
-  let token = {
+  const token = {
     id: this._id,
     role: this.role,
     type: type || 'user',
@@ -87,7 +90,7 @@ users.methods.generateToken = function(type) {
 
   let options = {};
   if (type !== 'key' && !!TOKEN_LIFETIME) {
-    options = { expiresIn: TOKEN_LIFETIME };
+    options.expiresIn = TOKEN_LIFETIME;
   }
 
   return jwt.sign(token, SECRET, options);

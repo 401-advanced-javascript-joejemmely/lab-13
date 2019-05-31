@@ -36,7 +36,7 @@ authRouter.get('/oauth', (req, res, next) => {
 });
 
 authRouter.get('/protected-route', auth, (req, res, next) => {
-  res.status(200).send('asdf');
+  res.status(200).send('You made it to the protected route');
 });
 
 authRouter.post('/key', auth, (req, res, next) => {
