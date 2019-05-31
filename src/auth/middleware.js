@@ -14,8 +14,8 @@ module.exports = (req, res, next) => {
     default:
       return _authError();
     }
-  } catch (e) {
-    next(e);
+  } catch (error) {
+    next(error);
   }
 
   function _authBasic(str) {
