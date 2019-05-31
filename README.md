@@ -9,25 +9,13 @@
 - [submission PR](https://github.com/401-advanced-javascript-joejemmely/lab-13/pull/1)
 - [travis](https://travis-ci.com/401-advanced-javascript-joejemmely/lab-13)
 
-#### Documentation
-
-- [api docs](http://xyz.com) (API servers)
-
-### Modules
-
-#### `modulename.js`
-
-##### Exported Values and Methods
-
-###### `foo(thing) -> string`
-
 ### Setup
 
 #### `.env` requirements
 
 - `PORT` - Port Number
 - `MONGODB_URI` - URL to the running mongo instance/db
-- `SECRET` - Well, it's a secret so don't share it with anyone
+- `SECRET` - Well, it's a secret so don't share it with anyone and use your own
 - `SINGLE_USE_TOKENS` - :boolean - whether to use single use tokens
 - `TOKEN_LIFETIME` - check https://github.com/zeit/ms for the formatting options
 
@@ -43,4 +31,4 @@
 
 #### UML
 
-Link to an image of the UML for your application and response to events
+![UML](https://raw.githubusercontent.com/401-advanced-javascript-bmj/lab-12-auth-server/readme/assets/uml.jpeg)
