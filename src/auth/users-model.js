@@ -4,12 +4,18 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const SINGLE_USE_TOKENS = !!process.env.SINGLE_USE_TOKENS;
+const TOKEN_LIFETIME = process.env.TOKEN_LIFETIME;
+const SECRET = process.env.SECRET || 'this is unsafe';
+
 const users = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   email: { type: String },
   role: { type: String, default: 'user', enum: ['admin', 'editor', 'user'] },
 });
+
+const usedTokens = new Set();
 
 users.pre('save', function(next) {
   bcrypt
@@ -52,13 +58,18 @@ users.statics.authenticateBasic = function(auth) {
 };
 
 users.statics.authenticateBearer = function(token) {
-  const decryptedToken = jwt.verify(token, process.env.SECRET || 'changeit');
-  const query = { _id: decryptedToken.id };
-  return this.findOne(query)
-    .then(user => user)
-    .catch(error => {
-      throw error;
-    });
+  if (usedTokens.has(token)) {
+    return Promise.reject('Invalid Token');
+  }
+
+  try {
+    let parsedToken = jwt.verify(token, SECRET);
+    SINGLE_USE_TOKENS && parsedToken.type !== 'key' && usedTokens.add(token);
+    let query = { _id: parsedToken.id };
+    return this.findOne(query);
+  } catch (e) {
+    throw new Error('Invalid Token');
+  }
 };
 
 users.methods.comparePassword = function(password) {
@@ -67,16 +78,23 @@ users.methods.comparePassword = function(password) {
     .then(valid => (valid ? this : null));
 };
 
-users.methods.generateToken = function() {
+users.methods.generateToken = function(type) {
   let token = {
     id: this._id,
     role: this.role,
+    type: type || 'user',
   };
 
-  // Toggle time-sensitive JWT
-  return process.env.TSJWT
-    ? jwt.sign(token, process.env.SECRET, { expiresIn: '15m' })
-    : jwt.sign(token, process.env.SECRET);
+  let options = {};
+  if (type !== 'key' && !!TOKEN_LIFETIME) {
+    options = { expiresIn: TOKEN_LIFETIME };
+  }
+
+  return jwt.sign(token, SECRET, options);
+};
+
+users.methods.generateKey = function() {
+  return this.generateToken('key');
 };
 
 module.exports = mongoose.model('users', users);

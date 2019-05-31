@@ -37,7 +37,9 @@ Usage Notes or examples
 
 - `PORT` - Port Number
 - `MONGODB_URI` - URL to the running mongo instance/db
-- `SECRET`
+- `SECRET` - Well, it's a secret so don't share it with anyone
+- `SINGLE_USE_TOKENS` - :boolean - whether to use single use tokens
+- `TOKEN_LIFETIME` - check https://github.com/zeit/ms for the formatting options
 
 #### Running the app
 
