@@ -42,8 +42,8 @@ users.statics.createFromOauth = function(email) {
     })
     .catch(error => {
       console.log('Creating new user');
-      let username = email;
-      let password = 'none';
+      const username = email;
+      const password = 'none';
       return this.create({ username, password, email });
     });
 };
@@ -68,7 +68,7 @@ users.statics.authenticateBearer = function(token) {
       usedTokens.add(token);
     }
 
-    let query = { _id: parsedToken.id };
+    const query = { _id: parsedToken.id };
     return this.findOne(query);
   } catch (error) {
     return Promise.reject('Invalid Token');
@@ -88,7 +88,7 @@ users.methods.generateToken = function(type) {
     type: type || 'user',
   };
 
-  let options = {};
+  const options = {};
   if (type !== 'key' && !!TOKEN_LIFETIME) {
     options.expiresIn = TOKEN_LIFETIME;
   }
